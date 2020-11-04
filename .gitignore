@@ -1,0 +1,7 @@
+.python-version
+.DS_Store
+res
+220-logistic-regression.pdf
+.ipynb_checkpoints
+__pycache__
+.vscode
