@@ -1,0 +1,48 @@
+Test golden, data: generated
+----------------------------------------------------------------------
+Cross entropy:  0.004217974389689653
+ROC AUC score:  1.0
+Cross entropy (sklearn):  2.78240020886093e-11
+ROC AUC score (sklearn):  1.0
+Difference: 0.004217974361865651
+
+Test brent, data: generated
+----------------------------------------------------------------------
+Cross entropy:  0.003404151940243564
+ROC AUC score:  1.0
+Cross entropy (sklearn):  2.759946398442823e-11
+ROC AUC score (sklearn):  1.0
+Difference: 0.0034041519126441
+
+Test golden, data: ../data/a1a.txt
+----------------------------------------------------------------------
+Cross entropy:  0.29874534274552556
+ROC AUC score:  0.7880740663249293
+Cross entropy (sklearn):  0.2978755986559931
+ROC AUC score (sklearn):  0.7906057118945496
+Difference: 0.0008697440895324426
+
+Test brent, data: ../data/a1a.txt
+----------------------------------------------------------------------
+Cross entropy:  0.298258697508425
+ROC AUC score:  0.7893398891097394
+Cross entropy (sklearn):  0.2978755986559931
+ROC AUC score (sklearn):  0.7906057118945496
+Difference: 0.00038309885243187347
+
+Test golden, data: ../data/breast-cancer_scale.txt
+----------------------------------------------------------------------
+Cross entropy:  0.07547296415402745
+ROC AUC score:  0.9657261864374835
+Cross entropy (sklearn):  0.07531873560376248
+ROC AUC score (sklearn):  0.9657261864374835
+Difference: 0.00015422855026496485
+
+Test brent, data: ../data/breast-cancer_scale.txt
+----------------------------------------------------------------------
+Cross entropy:  0.07541929382171567
+ROC AUC score:  0.9657261864374835
+Cross entropy (sklearn):  0.07531873560376248
+ROC AUC score (sklearn):  0.9657261864374835
+Difference: 0.00010055821795318387
+
