@@ -7,7 +7,7 @@ def parabola_min(x1, x2, x3, fx1, fx2, fx3):
     f2sf1 = fx2 - fx1
     f2sf3 = fx2 - fx3
     
-    u = x2 - (x2sx1**2*f2sf3 - x2sx3**2*f2sf1) / (2*(x2sx1*f2sf3 - x2sx3*f2sf1) + 1e-8)
+    u = x2 - (x2sx1**2*f2sf3 - x2sx3**2*f2sf1) / (2*(x2sx1*f2sf3 - x2sx3*f2sf1) + 1e-12)
     return u
 
 

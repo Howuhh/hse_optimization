@@ -7,18 +7,19 @@ from grad_check import eval_num_grad, eval_num_hessian
 
 from scipy.special import expit
 
-def sigmoid(z, safe=False):
+
+def sigmoid(z):
     assert isinstance(z, np.ndarray)
 
-    # return np.exp(z) / (1 + np.exp(z))
-    # much faster and stable (no overflow)
     return expit(z)    
 
 
 def binary_cross_entropy(X, y, w):
-    N = X.shape[0]
+    N, Xw = X.shape[0], X @ w
+
+    loss = np.sum(y * np.log(sigmoid(Xw) + 1e-15) + (1 - y) * np.log(1 - sigmoid(Xw) + 1e-15))
+    # loss = y.T @ np.log(sigmoid(X @ w) + 1e-12) + (1 - y).T @ np.log(1 - sigmoid(X @ w) + 1e-12)
     
-    loss = np.sum(y * np.log(sigmoid(X @ w) + 1e-12) + (1 - y) * np.log(1 - sigmoid(X @ w) + 1e-12))
     return -1/N * loss
 
 
@@ -29,9 +30,9 @@ def entropy_grad(X, y, w):
 
 
 def entropy_hessian(X, w):
-    N = X.shape[0]
+    N, Xw = X.shape[0], X @ w
     
-    hessian = X.T @ multiply(X, sigmoid(X @ w) * (1 - sigmoid(X @ w))) / N
+    hessian = X.T @ multiply(X, sigmoid(Xw) * (1 - sigmoid(Xw))) / N
     
     if hasattr(hessian, "toarray"):
         return hessian.toarray()

@@ -37,5 +37,23 @@ def multiply(matrix, const):
         return matrix.multiply(const)
 
 
+def shift_positive_definite(X):
+    alpha_I = 1e-6 * np.identity(X.shape[0])
+    
+    while np.any(np.linalg.eigvals(X) <= 0):
+        X = X + alpha_I
+
+    return X
+
+
+def solve_cholesky(A, b):
+    L = np.linalg.cholesky(A)
+    
+    y = np.linalg.solve(L, b)
+    x = np.linalg.solve(np.matrix(L).H, y)
+    
+    return x
+
+
 if __name__ == "__main__":
     print(generate_dataset(5))

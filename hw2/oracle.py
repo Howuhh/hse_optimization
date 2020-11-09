@@ -13,11 +13,11 @@ class Oracle:
     def __init__(self, X, y):
         self.X = X
         self.y = y
-        
+
     def value(self, w):
         return binary_cross_entropy(self.X, self.y, w)
 
-    def grad(self, w):
+    def grad(self, w):        
         return entropy_grad(self.X, self.y, w)
 
     def hessian(self, w):
@@ -38,7 +38,7 @@ class Oracle:
 
 def make_oracle(data_path=None, sparse=False):
     if data_path is None:
-        X, y, _ = generate_dataset(n=1000, w_dim=2)
+        X, y, _ = generate_dataset(n=1_000_000, w_dim=12)
     else:
         X, y = load_svmlight_file(data_path)
         
