@@ -23,6 +23,7 @@ def eval_num_hessian(f, w, h=None):
     "forward difference hessian approximation"
     if h is None:
         h = np.power(1.1 * 10e-16, 1/3)
+        # h = 1e-5
     n = w.shape[0]
     
     hessian = np.zeros((n, n), dtype=np.float64)
@@ -30,7 +31,7 @@ def eval_num_hessian(f, w, h=None):
     
     fw = f(w)
     fws = np.empty(n, dtype=np.float64)
-    
+
     for i in range(n):
         fws[i] = f(w + e[i, :])
     

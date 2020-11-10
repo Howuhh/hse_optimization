@@ -54,7 +54,7 @@ def wolfe_line_search(oracle, w, direction):
 
 
 def lipschitz_line_search(oracle, w, direction):
-    L = 1.0 
+    L = 0.1
     w_new = w - (1 / L) * direction
 
     fw = oracle.value(w)
@@ -63,6 +63,6 @@ def lipschitz_line_search(oracle, w, direction):
         L = L * 2
         w_new = w_new - (1 / L) * direction
 
-    L = max(1.0, L / 2)
+    # L = max(1.0, L / 2)
 
     return 1 / L

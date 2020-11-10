@@ -55,5 +55,26 @@ def solve_cholesky(A, b):
     return x
 
 
+def conjugate_grad(hess_vec_prod, b):
+    x = np.ones(b.shape[1]).reshape(-1, 1)
+    
+    grad = hess_vec_prod(x) - b # A @ x - b
+    direction = -grad
+    
+    while np.linalg.norm(grad)**2 > 1e-8:
+        grad_dot_old = grad.T @ grad
+        A_p = hess_vec_prod(direction) # A @ direction
+        
+        alpha = grad_dot_old / (direction.T @ A_p)
+        
+        x = x + alpha * direction
+        grad = grad + alpha * A_p
+        
+        beta = grad.T @ grad / grad_dot_old
+        direction = - grad + beta * direction
+
+    return x
+
+
 if __name__ == "__main__":
     print(generate_dataset(5))
