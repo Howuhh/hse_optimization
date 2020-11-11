@@ -19,9 +19,6 @@ def _line_search(oracle, w, direction, optimizer):
         
     a, c, b = bracket(f, xa=xa, xb=xb)[:3]
     
-    if a > b:
-        a, b = b, a
-        
     return optimizer(f, a, b, 1e-5, 50)
     
     
@@ -57,15 +54,18 @@ def wolfe_line_search(oracle, w, direction):
 
 
 def lipschitz_line_search(oracle, w, direction):
-    L = 0.1
+    L = max(oracle.L / 2, 0.4)
+    
     w_new = w - (1 / L) * direction
 
     fw = oracle.value(w)
+    p_norm = np.linalg.norm(direction)**2
+    grad_dot_d = direction.T @ direction
 
-    while oracle.value(w_new) > fw + (w_new - w).T @ direction + (L / 2) * np.linalg.norm(w_new - w)**2:
+    while oracle.value(w_new) > fw + (1 / L) * grad_dot_d + 1 / (2*L) * p_norm:
         L = L * 2
         w_new = w_new - (1 / L) * direction
 
-    # L = max(1.0, L / 2) # ????
+    oracle.L = L
 
     return 1 / L

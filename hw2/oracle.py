@@ -13,6 +13,7 @@ class Oracle:
     def __init__(self, X, y):
         self.X = X
         self.y = y
+        self.L = 0.4
         
         self._h = np.power(1.1 * 10e-16, 1/3)
         self._call_count = 0

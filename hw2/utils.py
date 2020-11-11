@@ -60,7 +60,7 @@ def inexact_conjugate_grad(hess_vec_prod, grad, max_iter=1000):
     r, direction = grad, -grad
     
     grad_norm = np.linalg.norm(grad)
-    eps = min(0.3, np.sqrt(grad_norm)) * grad_norm
+    eps = min(0.1, np.sqrt(grad_norm)) * grad_norm
     
     for i in range(max_iter):
         Hd = hess_vec_prod(direction)
