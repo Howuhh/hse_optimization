@@ -18,6 +18,9 @@ def _line_search(oracle, w, direction, optimizer):
         xa, xb = xb, xa
         
     a, c, b = bracket(f, xa=xa, xb=xb)[:3]
+    
+    if a > b:
+        a, b = b, a
         
     return optimizer(f, a, b, 1e-5, 50)
     
@@ -63,6 +66,6 @@ def lipschitz_line_search(oracle, w, direction):
         L = L * 2
         w_new = w_new - (1 / L) * direction
 
-    # L = max(1.0, L / 2)
+    # L = max(1.0, L / 2) # ????
 
     return 1 / L

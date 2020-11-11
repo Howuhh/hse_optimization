@@ -55,23 +55,34 @@ def solve_cholesky(A, b):
     return x
 
 
-def conjugate_grad(hess_vec_prod, b):
-    x = np.ones(b.shape[1]).reshape(-1, 1)
+def inexact_conjugate_grad(hess_vec_prod, grad, max_iter=1000):
+    x = np.zeros_like(grad)
+    r, direction = grad, -grad
     
-    grad = hess_vec_prod(x) - b # A @ x - b
-    direction = -grad
+    grad_norm = np.linalg.norm(grad)
+    eps = min(0.3, np.sqrt(grad_norm)) * grad_norm
     
-    while np.linalg.norm(grad)**2 > 1e-8:
-        grad_dot_old = grad.T @ grad
-        A_p = hess_vec_prod(direction) # A @ direction
+    for i in range(max_iter):
+        Hd = hess_vec_prod(direction)
         
-        alpha = grad_dot_old / (direction.T @ A_p)
+        pos_def = direction.T @ Hd
+        grad_dot_old = r.T @ r
         
+        if pos_def <= 0:
+            if i == 0:
+                return -grad
+            else:
+                return x
+                        
+        alpha = grad_dot_old / pos_def
         x = x + alpha * direction
-        grad = grad + alpha * A_p
+        r = r + alpha * Hd
         
-        beta = grad.T @ grad / grad_dot_old
-        direction = - grad + beta * direction
+        if np.linalg.norm(r) < eps:
+            return x
+        
+        beta = r.T @ r / grad_dot_old
+        direction = -r + beta * direction
 
     return x
 

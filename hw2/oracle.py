@@ -13,7 +13,9 @@ class Oracle:
     def __init__(self, X, y):
         self.X = X
         self.y = y
-        self.h = np.power(1.1 * 10e-16, 1/3)
+        
+        self._h = np.power(1.1 * 10e-16, 1/3)
+        self._call_count = 0
 
     def value(self, w):        
         return binary_cross_entropy(self.X, self.y, w)
@@ -25,10 +27,10 @@ class Oracle:
         return entropy_hessian(self.X, w)
 
     def hessian_vec_product(self, w, d):   
-        f_f = self.grad(w + self.h * d).reshape(-1, 1)
-        f_b = self.grad(w - self.h * d).reshape(-1, 1)
+        f_f = self.grad(w + self._h * d).reshape(-1, 1)
+        f_b = self.grad(w - self._h * d).reshape(-1, 1)
         
-        return (f_f - f_b) / (2*self.h)
+        return (f_f - f_b) / (2*self._h)
 
     def fuse_value_grad(self, w):
         return self.value(w), self.grad(w)
@@ -42,7 +44,7 @@ class Oracle:
 
 def make_oracle(data_path=None, sparse=False):
     if data_path is None:
-        X, y, _ = generate_dataset(n=1000, w_dim=3)
+        X, y, _ = generate_dataset(n=1000, w_dim=10)
     else:
         X, y = load_svmlight_file(data_path)
         
@@ -50,3 +52,10 @@ def make_oracle(data_path=None, sparse=False):
         y = LabelBinarizer().fit_transform(y)
     
     return Oracle(X, y)
+
+
+if __name__ == "__main__":
+    oracle = make_oracle()
+    w = np.random.uniform(size=(oracle.X.shape[1], 1))
+    
+    assert np.allclose(oracle.hessian(w) @ w, oracle.hessian_vec_product(w, w))
