@@ -7,7 +7,7 @@ from optimize_single.golden import golden_section
 from optimize_single.brent import brent
 
 
-def _line_search(oracle, w, direction, optimizer):
+def _line_search(oracle, w, direction, optimizer, eps, max_iter):
     assert w.shape == direction.shape, "diff shape for w and direction"
     
     def f(alpha):
@@ -19,15 +19,15 @@ def _line_search(oracle, w, direction, optimizer):
         
     a, c, b = bracket(f, xa=xa, xb=xb)[:3]
     
-    return optimizer(f, a, b, 1e-5, 50)
+    return optimizer(f, a, b, eps=eps, max_iter=50)
     
     
 def golden_line_search(oracle, w, direction):
-    return _line_search(oracle, w, direction, golden_section) 
+    return _line_search(oracle, w, direction, golden_section, 1e-3, 25) 
 
 
 def brent_line_search(oracle, w, direction):        
-    return _line_search(oracle, w, direction, brent) 
+    return _line_search(oracle, w, direction, brent, 1e-5, 50) 
 
 
 def armijo_line_search(oracle, w, direction):    

@@ -40,7 +40,7 @@ def hf_newton_step(oracle, w, grad0_norm, line_search, tol):
     )
 
     alpha = line_search(oracle, w, -direction)
-    w = w + alpha * (direction / np.linalg.norm(direction)) # may stuck in place without normalization
+    w = w + alpha * direction # (direction / np.linalg.norm(direction)) # may stuck in place without normalization
     
     grad_norm = np.linalg.norm(grad)**2
 
