@@ -54,7 +54,7 @@ def main():
     # oracle = make_oracle()
 
     w_n = oracle.X.shape[1]
-    # w_init = np.random.uniform(-1/np.sqrt(w_n), 1/np.sqrt(w_n), size=w_n).reshape(-1, 1)
+    w_init = np.random.uniform(-1/np.sqrt(w_n), 1/np.sqrt(w_n), size=w_n).reshape(-1, 1)
     w_init = np.random.uniform(size=w_n).reshape(-1, 1)
     # w_init = np.random.normal(size=w_n).reshape(-1, 1)
     # w_init = np.zeros(w_n).reshape(-1, 1)
