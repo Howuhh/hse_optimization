@@ -17,16 +17,16 @@ def _line_search(oracle, w, direction, optimizer, eps, max_iter):
     if f(xa) > f(xb):
         xa, xb = xb, xa
         
-    a, c, b = bracket(f, xa=xa, xb=xb)[:3]
-    
-    return optimizer(f, a, b, eps=eps, max_iter=50)
+    brack = bracket(f, xa=xa, xb=xb)[:3]
+
+    return optimizer(f, brack, eps=eps, max_iter=max_iter)
     
     
 def golden_line_search(oracle, w, direction):
-    return _line_search(oracle, w, direction, golden_section, 1e-3, 25) 
+    return _line_search(oracle, w, direction, golden_section, 1e-5, 25) 
 
 
-def brent_line_search(oracle, w, direction):        
+def brent_line_search(oracle, w, direction):
     return _line_search(oracle, w, direction, brent, 1e-5, 50) 
 
 

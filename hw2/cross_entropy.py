@@ -15,7 +15,7 @@ def sigmoid(z):
 def binary_cross_entropy(X, y, w):
     N, Xw = X.shape[0], X @ w
 
-    loss = np.sum(y * np.log(sigmoid(Xw) + 1e-15) + (1 - y) * np.log(1 - sigmoid(Xw) + 1e-15))
+    loss = np.sum(y * np.log(sigmoid(Xw) + 1e-12) + (1 - y) * np.log(1 - sigmoid(Xw) + 1e-12))
     # loss = y.T @ np.log(sigmoid(X @ w) + 1e-12) + (1 - y).T @ np.log(1 - sigmoid(X @ w) + 1e-12)
     
     return -1/N * loss

@@ -7,11 +7,13 @@ def parabola_min(x1, x2, x3, fx1, fx2, fx3):
     f2sf1 = fx2 - fx1
     f2sf3 = fx2 - fx3
     
-    u = x2 - (x2sx1**2*f2sf3 - x2sx3**2*f2sf1) / (2*(x2sx1*f2sf3 - x2sx3*f2sf1) + 1e-12)
+    u = x2 - (x2sx1**2*f2sf3 - x2sx3**2*f2sf1) / (2*(x2sx1*f2sf3 - x2sx3*f2sf1) + 1e-15)
     return u
 
 
-def brent(f, a, b, eps=1e-8, max_iter=200):
+def brent(f, brack, eps=1e-8, max_iter=200):
+    a, c, b = brack
+    
     K = (3 - 5 ** 0.5) / 2
     x = w = v = a + K * (b - a)
     fx = fw = fv = f(x)
@@ -96,4 +98,4 @@ def brent(f, a, b, eps=1e-8, max_iter=200):
 if __name__ == "__main__":
     f = lambda x: (x - 2)**2
 
-    print(round(brent(f, -3, 3), 4))
+    print(brent(f, -10, 10, max_iter=500))

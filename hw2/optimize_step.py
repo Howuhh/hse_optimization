@@ -21,6 +21,7 @@ def newton_step(oracle, w, grad0_norm, line_search, tol):
     
     pos_hessian = shift_positive_definite(hessian)
     direction = solve_cholesky(pos_hessian, grad.reshape(-1, 1))
+    # direction = np.linalg.inv(pos_hessian) @ grad.reshape(-1, 1)
 
     alpha = line_search(oracle, w, direction)
     w = w - alpha * direction
@@ -40,7 +41,7 @@ def hf_newton_step(oracle, w, grad0_norm, line_search, tol):
     )
 
     alpha = line_search(oracle, w, -direction)
-    w = w + alpha * direction # (direction / np.linalg.norm(direction)) # may stuck in place without normalization
+    w = w + alpha * (direction / np.linalg.norm(direction)) # may stuck in place without normalization
     
     grad_norm = np.linalg.norm(grad)**2
 

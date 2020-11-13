@@ -18,28 +18,35 @@ class Oracle:
         self._h = np.power(1.1 * 10e-16, 1/3)
         self._call_count = 0
 
-    def value(self, w):        
+    def value(self, w):       
+        self._call_count += 1 
         return binary_cross_entropy(self.X, self.y, w)
 
-    def grad(self, w):        
+    def grad(self, w):
+        self._call_count += 1        
         return entropy_grad(self.X, self.y, w)
 
     def hessian(self, w):
+        self._call_count +=1
         return entropy_hessian(self.X, w)
 
-    def hessian_vec_product(self, w, d):   
+    def hessian_vec_product(self, w, d):
+        self._call_count += 1   
         f_f = self.grad(w + self._h * d).reshape(-1, 1)
         f_b = self.grad(w - self._h * d).reshape(-1, 1)
         
         return (f_f - f_b) / (2*self._h)
 
     def fuse_value_grad(self, w):
+        self._call_count -= 1
         return self.value(w), self.grad(w)
 
     def fuse_value_grad_hessian(self, w):
+        self._call_count -= 2
         return self.value(w), self.grad(w), self.hessian(w)
 
     def fuse_value_grad_hessian_vec_product(self, w, d):
+        self._call_count -= 2
         return self.value(w), self.grad(w), self.hessian_vec_product(w, d)
 
 
