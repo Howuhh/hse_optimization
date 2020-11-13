@@ -23,6 +23,6 @@ class OptimizeLog:
         
     def get_log(self):
         logs = [self.time, self.entropy, self.alpha, self.grad_info, self.call_count]
-        names = ["time", "entropy", "lr", "grad info", "call count"]
+        names = ["time", "entropy", "lr", "grad_info", "call_count"]
         
         return {name: np.array(arr) for name, arr in zip(names, logs)}
