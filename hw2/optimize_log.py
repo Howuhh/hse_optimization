@@ -22,7 +22,7 @@ class OptimizeLog:
         self.call_count.append(call_count)
         
     def get_log(self):
-        logs = [self.time, self.entropy, self.alpha, self.grad_info, self.call_count]
-        names = ["time", "entropy", "lr", "grad_info", "call_count"]
+        logs = [len(self.time), self.time, self.entropy, self.alpha, self.grad_info, self.call_count]
+        names = ["num_iter", "time", "entropy", "lr", "grad_info", "call_count"]
         
         return {name: np.array(arr) for name, arr in zip(names, logs)}

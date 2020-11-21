@@ -1,7 +1,8 @@
+import scipy
 import numpy as np
 
-from utils import shift_positive_definite, solve_cholesky
-from utils import inexact_conjugate_grad
+# from utils import shift_positive_definite, solve_cholesky
+from utils import shift_positive_definite_cho, inexact_conjugate_grad
 
     
 def descent_step(oracle, w, grad0_norm, line_search, tol):
@@ -19,14 +20,15 @@ def descent_step(oracle, w, grad0_norm, line_search, tol):
 def newton_step(oracle, w, grad0_norm, line_search, tol):
     fi, grad, hessian = oracle.fuse_value_grad_hessian(w)
     
-    pos_hessian = shift_positive_definite(hessian)
-    direction = solve_cholesky(pos_hessian, grad.reshape(-1, 1))
-    # direction = np.linalg.inv(pos_hessian) @ grad.reshape(-1, 1)
-
+    # pos_hessian = shift_positive_definite(hessian)
+    # direction = solve_cholesky(pos_hessian, grad.reshape(-1, 1))
+    L = shift_positive_definite_cho(hessian)
+    direction = scipy.linalg.cho_solve((L, True), grad.reshape(-1, 1))
+        
     alpha = line_search(oracle, w, direction)
     w = w - alpha * direction
     
-    grad_norm = np.linalg.norm(grad)**2
+    grad_norm = np.linalg.norm(grad)**2 / grad0_norm
     
     return w, (grad_norm <= tol), (fi, alpha, grad_norm)
 
@@ -39,10 +41,14 @@ def hf_newton_step(oracle, w, grad0_norm, line_search, tol):
         lambda d: oracle.hessian_vec_product(w=w, d=d), 
         grad=grad.reshape(-1, 1)
     )
-
+        
     alpha = line_search(oracle, w, -direction)
-    w = w + alpha * (direction / np.linalg.norm(direction)) # may stuck in place without normalization
     
-    grad_norm = np.linalg.norm(grad)**2
+    # if np.max(np.abs(grad)) > 0.1:
+        # direction = direction / np.linalg.norm(direction)
+    # w = w + alpha * (direction / np.linalg.norm(direction)) # may stuck in place without normalization
+    w = w + alpha * direction
+
+    grad_norm = np.linalg.norm(grad)**2 / grad0_norm
 
     return w, (grad_norm <= tol), (fi, alpha, grad_norm)

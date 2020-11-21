@@ -2,6 +2,7 @@ import numpy as np
 import step_search
 
 from time import time
+from tabulate import tabulate
 from oracle import make_oracle
 from optimize_log import OptimizeLog
 
@@ -47,21 +48,17 @@ def optimize_hfn(oracle, start_point, line_search_method="armijo", tol=1e-8, max
     return _optimize(hf_newton_step, oracle, start_point, line_search_method, tol, max_iter, verbose)
 
 
-def main():
+def main():    
     oracle = make_oracle("data/a1a.txt")
-    # oracle = make_oracle()
 
     w_n = oracle.X.shape[1]
     # w_init = np.random.uniform(-1/np.sqrt(w_n), 1/np.sqrt(w_n), size=w_n).reshape(-1, 1)
-
-    # w_init = np.random.uniform(size=w_n).reshape(-1, 1)
-    # w_init = np.random.normal(size=w_n).reshape(-1, 1)
     w_init = np.zeros(w_n).reshape(-1, 1)
     # w_init = np.ones(w_n).reshape(-1, 1)
 
-    w, log = optimize_gd(oracle, w_init, "golden", tol=1e-8, verbose=True)
-    # print(oracle._call_count)
-
+    w, log = optimize_newton(oracle, w_init, "wolfe", tol=1e-8, verbose=True)
+    print(log.get_log()["time"][-1])
+    
     
 if __name__ == "__main__":
     main()

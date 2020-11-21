@@ -13,7 +13,7 @@ class Oracle:
     def __init__(self, X, y):
         self.X = X
         self.y = y
-        self.L = 0.4
+        self.L = 1.0
         
         self._h = np.power(1.1 * 10e-16, 1/3)
         self._call_count = 0
@@ -27,7 +27,7 @@ class Oracle:
         return entropy_grad(self.X, self.y, w)
 
     def hessian(self, w):
-        self._call_count +=1
+        self._call_count += 1
         return entropy_hessian(self.X, w)
 
     def hessian_vec_product(self, w, d):

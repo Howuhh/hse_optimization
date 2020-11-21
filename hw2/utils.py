@@ -37,22 +37,34 @@ def multiply(matrix, const):
         return matrix.multiply(const)
 
 
-def shift_positive_definite(X):
-    alpha_I = 1e-6 * np.identity(X.shape[0])
-    
-    while np.any(np.linalg.eigvals(X) <= 0):
-        X = X + alpha_I
+def shift_positive_definite_cho(X):
+    eps, I = 1e-16, np.identity(X.shape[0])
 
-    return X
+    while True:
+        try:
+            L = np.linalg.cholesky(X)
+            break
+        except np.linalg.LinAlgError:
+            X = X + eps * I
+            eps = eps * 2
+              
+    return L
+
+# def shift_positive_definite(X):
+#     alpha_I = 1e-6 * np.identity(X.shape[0])
+    
+#     while np.any(np.linalg.eigvals(X) <= 0):
+#         X = X + alpha_I
+
+#     return X
 
 
-def solve_cholesky(A, b):
-    L = np.linalg.cholesky(A)
+# def solve_cholesky(A, b):
+#     L = np.linalg.cholesky(A)
+#     y = np.linalg.solve(L, b)
+#     x = np.linalg.solve(np.matrix(L).H, y)
     
-    y = np.linalg.solve(L, b)
-    x = np.linalg.solve(np.matrix(L).H, y)
-    
-    return x
+#     return x
 
 
 def inexact_conjugate_grad(hess_vec_prod, grad, max_iter=1000):
