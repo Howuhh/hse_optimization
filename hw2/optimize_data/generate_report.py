@@ -24,7 +24,7 @@ def print_report(config, data_path=None):
             w, log = optimizer(oracle, w_init, line_search, tol=1e-8, max_iter=10000, verbose=False)
             info = log.get_log()
     
-            table.append([line_search, info["entropy"][-1], info["num_iter"], info["call_count"][-1], round(info["time"][-1], 2)])
+            table.append([line_search, info["entropy"][-1], info["num_iter"], info["oracle_calls"][-1], round(info["time"][-1], 2)])
     
         print(f"- {method.upper()} " + "-" * (68 - len(method)))
         print(tabulate(table, tablefmt="github", headers="firstrow"))
@@ -49,7 +49,6 @@ def main():
     }
     
     print_report(config, "../data/a1a.txt")
-    # print_report(config, "../data/breast-cancer_scale.txt")
     
     
 if __name__ == "__main__":

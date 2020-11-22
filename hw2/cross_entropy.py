@@ -38,11 +38,11 @@ def entropy_hessian(X, w):
     return hessian
  
 
-def test_grad(n=1000, iters=1000):
+def test_grad(sample_size=1000, n_iters=1000):
     grad_err, hess_err = [], []
     
-    for _ in range(1000):
-        X, y, _ = generate_dataset(n=1000)
+    for _ in range(n_iters):
+        X, y, _ = generate_dataset(n=sample_size)
         w_init = np.random.uniform(size=(X.shape[1], 1))
                 
         num_grad = eval_num_grad(lambda w: binary_cross_entropy(X, y, w=w.reshape(-1, 1)), w_init.ravel())
@@ -55,8 +55,8 @@ def test_grad(n=1000, iters=1000):
         
         hess_err.append(rell_error(true_hessian, num_hessian))
 
-    print(f"Mean relative error (n={n}, iter={iters})")
-    print("--"*14)
+    print(f"Mean maximum relative error (n={sample_size}, iterations={n_iters})")
+    print("--"*16)
     print("gradient: ", np.mean(grad_err))
     print("hessian: ", np.mean(hess_err))
 

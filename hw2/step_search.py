@@ -35,14 +35,14 @@ def armijo_line_search(oracle, w, direction):
         return oracle.value(w - alpha * direction)
     
     alpha = max(bracket(f)[:3])
-    p, c = 0.5, 0.0001
+    c = 0.0001
     
     fk = oracle.value(w)
     grad_norm = c * oracle.grad(w) @ direction
 
     i = 0
     while oracle.value(w - alpha * direction) >= fk + alpha * grad_norm and i <= 10000:
-        alpha = p * alpha
+        alpha = 0.5 * alpha
         i += 1
         
     return alpha
