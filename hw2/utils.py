@@ -1,5 +1,7 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
+from oracle import make_oracle
 from scipy.sparse import csr_matrix
 
 
@@ -15,15 +17,6 @@ def generate_dataset(n=50, w_dim=1, sparse=False):
         X = csr_matrix(X)
 
     return X, y, w
-
-
-def confusion_matrix(true, pred):
-    result = np.zeros((2, 2))
-
-    for i in range(len(true)):
-        result[int(pred[i]), int(true[i])] += 1
-
-    return result
 
 
 def rell_error(pred, true_):
@@ -67,12 +60,18 @@ def shift_positive_definite_cho(X):
 #     return x
 
 
-def inexact_conjugate_grad(hess_vec_prod, grad, max_iter=1000):
+def inexact_conjugate_grad(hess_vec_prod, grad, tol, max_iter=1000):
     x = np.zeros_like(grad)
     r, direction = grad, -grad
     
     grad_norm = np.linalg.norm(grad)
-    eps = min(0.1, np.sqrt(grad_norm)) * grad_norm
+    
+    if tol == "sqrt":
+        eps = min(0.1, np.sqrt(grad_norm)) * grad_norm
+    elif tol == "norm":
+        eps = min(0.1, grad_norm) * grad_norm
+    else:
+        eps = 1e-4
     
     for i in range(max_iter):
         Hd = hess_vec_prod(direction)
@@ -97,6 +96,40 @@ def inexact_conjugate_grad(hess_vec_prod, grad, max_iter=1000):
         direction = -r + beta * direction
 
     return x
+
+
+def run_optimizer(data_path, optimizer, **kwargs):
+    oracle = make_oracle(data_path)
+    w_init = np.zeros(oracle.X.shape[1]).reshape(-1, 1)
+    
+    w, log = optimizer(oracle, w_init, **kwargs)
+    return log
+
+
+def plot_metric(log, method, xaxis, offset=0):
+    fig, ax = plt.subplots(1, 2, figsize=(18, 8))
+    
+    for line_search in log[method]:
+        line_search_log = log[method][line_search]
+        info = line_search_log.get_log()
+        
+        error = np.log10(line_search_log.error)[offset:]
+        grads = np.log10(info["grad_info"])[offset:]
+        
+        if xaxis == "num_iter":
+            metric = np.arange(error.shape[0])
+        else:
+            metric = info[xaxis][offset:]
+        
+        ax[0].plot(metric, error)
+        ax[1].plot(metric, grads, label=f"{line_search}: {round(info['entropy'][-1],6)}")
+        
+    ax[0].set(title="Convergence by $|F(w^*) - F(w)|$", 
+              xlabel=xaxis, ylabel="$\\log_{10} |F(w^*) - F(w)|$")
+    ax[1].set(title="Convergence by $\\frac{|\\nabla F(w)|}{|\\nabla F(w_0)|}$",
+              xlabel=xaxis, ylabel="$\\log_{10} \\frac{|\\nabla F(w)|}{|\\nabla F(w_0)|}$")
+    
+    ax[1].legend()
 
 
 if __name__ == "__main__":

@@ -30,18 +30,29 @@ def brent_line_search(oracle, w, direction):
     return _line_search(oracle, w, direction, brent, 1e-8, 64) 
 
 
-def armijo_line_search(oracle, w, direction):    
+def armijo_line_search(oracle, w, direction, init_alpha="mean"):    
     def f(alpha):
         return oracle.value(w - alpha * direction)
     
-    alpha = max(bracket(f)[:3])
+    brack = bracket(f)
+    x, fx = np.array(brack[:3]), np.array(brack[3:-1])
+    
+    if init_alpha == "wmean":
+        alpha = np.mean(x * fx)  # magick trick to boost armijo from 7k iterations to 2k iterations on gd
+    elif init_alpha == "mean":
+        alpha = np.mean(x) # a little less magick trick to boost armijo to 3.5k without breaking on other (not a1a) datasets 
+    elif init_alpha == "max":
+        alpha = max(x)
+    else:
+        alpha = 100
+
     c = 0.0001
     
     fk = oracle.value(w)
-    grad_norm = c * oracle.grad(w) @ direction
+    grad_norm = oracle.grad(w) @ direction
 
     i = 0
-    while oracle.value(w - alpha * direction) >= fk + alpha * grad_norm and i <= 10000:
+    while oracle.value(w - alpha * direction) > fk + alpha * c * grad_norm and i < 10000:
         alpha = 0.5 * alpha
         i += 1
         
@@ -52,7 +63,7 @@ def wolfe_line_search(oracle, w, direction):
     alpha = line_search(oracle.value, oracle.grad, w, -direction, direction.T)[0]
     
     if alpha is None:
-        alpha = armijo_line_search(oracle, w, direction)
+        alpha = armijo_line_search(oracle, w, direction, init_alpha="max")
 
     return alpha
 

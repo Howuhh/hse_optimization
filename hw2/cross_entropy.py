@@ -15,8 +15,9 @@ def sigmoid(z):
 def binary_cross_entropy(X, y, w):
     N, Xw = X.shape[0], X @ w
 
-    loss = np.sum(y * np.log(sigmoid(Xw) + 1e-12) + (1 - y) * np.log(1 - sigmoid(Xw) + 1e-12))
-    # loss = y.T @ np.log(sigmoid(X @ w) + 1e-12) + (1 - y).T @ np.log(1 - sigmoid(X @ w) + 1e-12)
+    eps = 1e-12
+    loss = np.sum(y * np.log(sigmoid(Xw) + eps) + (1 - y) * np.log(1 - sigmoid(Xw) + eps))
+    # loss = y.T @ np.log(sigmoid(X @ w) + eps) + (1 - y).T @ np.log(1 - sigmoid(X @ w) + eps)
     
     return -1/N * loss
 
@@ -29,7 +30,7 @@ def entropy_grad(X, y, w):
 
 def entropy_hessian(X, w):
     N, Xw = X.shape[0], X @ w
-    
+
     hessian = X.T @ multiply(X, sigmoid(Xw) * (1 - sigmoid(Xw))) / N
     
     if hasattr(hessian, "toarray"):

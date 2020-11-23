@@ -48,7 +48,8 @@ def main():
         }
     }
     
-    print_report(config, "../data/a1a.txt")
+    # print_report(config, "../data/a1a.txt")
+    print_report(config, "../data/breast-cancer_scale.txt")
     
     
 if __name__ == "__main__":
