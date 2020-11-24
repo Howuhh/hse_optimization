@@ -1,7 +1,7 @@
+import oracle
 import numpy as np
 import matplotlib.pyplot as plt
 
-from oracle import make_oracle
 from scipy.sparse import csr_matrix
 
 
@@ -43,22 +43,6 @@ def shift_positive_definite_cho(X):
               
     return L
 
-# def shift_positive_definite(X):
-#     alpha_I = 1e-6 * np.identity(X.shape[0])
-    
-#     while np.any(np.linalg.eigvals(X) <= 0):
-#         X = X + alpha_I
-
-#     return X
-
-
-# def solve_cholesky(A, b):
-#     L = np.linalg.cholesky(A)
-#     y = np.linalg.solve(L, b)
-#     x = np.linalg.solve(np.matrix(L).H, y)
-    
-#     return x
-
 
 def inexact_conjugate_grad(hess_vec_prod, grad, tol, max_iter=1000):
     x = np.zeros_like(grad)
@@ -99,10 +83,10 @@ def inexact_conjugate_grad(hess_vec_prod, grad, tol, max_iter=1000):
 
 
 def run_optimizer(data_path, optimizer, **kwargs):
-    oracle = make_oracle(data_path)
-    w_init = np.zeros(oracle.X.shape[1]).reshape(-1, 1)
+    oracle_ = oracle.make_oracle(data_path)
+    w_init = np.zeros(oracle_.X.shape[1]).reshape(-1, 1)
     
-    w, log = optimizer(oracle, w_init, **kwargs)
+    w, log = optimizer(oracle_, w_init, **kwargs)
     return log
 
 

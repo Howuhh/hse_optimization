@@ -53,7 +53,7 @@ def armijo_line_search(oracle, w, direction, init_alpha="mean"):
 
     i = 0
     while oracle.value(w - alpha * direction) > fk + alpha * c * grad_norm and i < 10000:
-        alpha = 0.5 * alpha
+        alpha = alpha / 2
         i += 1
         
     return alpha
@@ -69,19 +69,15 @@ def wolfe_line_search(oracle, w, direction):
 
 
 def lipschitz_line_search(oracle, w, direction):
-    L = oracle.L
-    
-    w_new = w - (1 / L) * direction
+    L = oracle.L # init with 1.0
 
-    fw = oracle.value(w)
-    p_norm = np.linalg.norm(direction)**2
-    grad_dot_d = direction.T @ direction
+    dir_norm = 0.5 * direction.T @ direction
 
-    while oracle.value(w_new) > fw + (1 / L) * grad_dot_d + (1 / (2*L)) * p_norm:
+    w_new = w - (1/L) * direction
+    while oracle.value(w_new) > oracle.value(w) - (1 / L) * dir_norm:
         L = L * 2
-        w_new = w_new - (1 / L) * direction
-        # w_new = w - (1 / L) * direction  # not working that way
-
-    oracle.L = max(L / 2, 0.4)
-
-    return 1 / L
+        w_new = w - (1/L) * direction
+        
+    oracle.L = (L / 2)
+    
+    return 1 / oracle.L

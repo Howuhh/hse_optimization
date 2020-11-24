@@ -31,7 +31,7 @@ class Oracle:
         return entropy_hessian(self.X, w)
 
     def hessian_vec_product(self, w, d):
-        self._call_count += 1   
+        self._call_count -= 1   
         f_f = self.grad(w + self._h * d).reshape(-1, 1)
         f_b = self.grad(w - self._h * d).reshape(-1, 1)
         

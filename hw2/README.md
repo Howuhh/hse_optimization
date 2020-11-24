@@ -1,7 +1,7 @@
 # HW2 - Gradient Descent, Newton, Hessian-Free Newton
 
 Results of all methods evaluation on [a1a](https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary.html) dataset.
-Best entropy by scipy baseline optimizer: `0.2978755986559931`
+Best entropy from scipy baseline optimizer: `0.2978755986559931`
 
 ## Gradien Descent 
 | line search   |   entropy |   num iter |   oracle calls |   time, s |
