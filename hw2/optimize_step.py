@@ -10,7 +10,6 @@ def descent_step(oracle, w, grad0_norm, line_search, tol):
     direction = grad.reshape(-1, 1)
 
     alpha = line_search(oracle, w, direction)
-    alpha = 1.0
     w = w - alpha * direction
     
     grad_ratio = np.linalg.norm(grad)**2 / grad0_norm
@@ -25,9 +24,6 @@ def newton_step(oracle, w, grad0_norm, line_search, tol):
     direction = scipy.linalg.cho_solve((L, True), grad.reshape(-1, 1))
     
     alpha = line_search(oracle, w, direction)
-    # if np.allclose(alpha, 0.0):
-        # alpha = 1.0
-    # w = w - alpha * direction / np.linalg.norm(direction)
     w = w - alpha * direction
     
     grad_norm = np.linalg.norm(grad)**2 / grad0_norm

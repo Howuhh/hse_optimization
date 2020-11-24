@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 
+
 sys.path.append('..')
 np.random.seed(42)
 
@@ -49,8 +50,8 @@ def main():
     }
     
     print_report(config, "../data/a1a.txt")
-    # print_report(config)
-    # print_report(config, "../data/breast-cancer_scale.txt")
+    print_report(config, "../data/breast-cancer_scale.txt")
+    print_report(config)
     
     
 if __name__ == "__main__":
