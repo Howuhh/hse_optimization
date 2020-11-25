@@ -1,7 +1,6 @@
 import scipy
 import numpy as np
 
-# from utils import shift_positive_definite, solve_cholesky
 from utils import shift_positive_definite_cho, inexact_conjugate_grad
 
     
@@ -23,6 +22,10 @@ def newton_step(oracle, w, grad0_norm, line_search, tol):
     L = shift_positive_definite_cho(hessian)
     direction = scipy.linalg.cho_solve((L, True), grad.reshape(-1, 1))
     
+    # if np.linalg.norm(grad) >= 1:
+        # print(np.linalg.norm(grad))
+        # direction = direction / np.linalg.norm(direction)
+    
     alpha = line_search(oracle, w, direction)
     w = w - alpha * direction
     
@@ -42,11 +45,6 @@ def hf_newton_step(oracle, w, grad0_norm, line_search, tol, cg_tol):
     )
         
     alpha = line_search(oracle, w, -direction)
-    # alpha = line_search(oracle, w, -direction)
-    
-    # if np.max(np.abs(grad)) > 0.1:
-        # direction = direction / np.linalg.norm(direction)
-    # w = w + alpha * (direction / np.linalg.norm(direction)) # may stuck in place without normalization
     w = w + alpha * direction
 
     grad_norm = np.linalg.norm(grad)**2 / grad0_norm

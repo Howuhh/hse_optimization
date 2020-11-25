@@ -34,7 +34,7 @@ def _optimize(optimize_step, oracle, w, line_search_method, armijo_init, tol, ma
         entropy, alpha, grad_norm = info   
         log.add_log(time(), entropy, alpha, grad_norm, oracle._call_count)
         
-        if verbose and i % 10 == 0:
+        if verbose and i % 1 == 0:
             print(f"Iteration {i}: {entropy}, alpha: {alpha}, grads: {grad_norm}")
         
         if stop_condition:
@@ -67,7 +67,7 @@ def main():
     # w_init = np.random.uniform(size=w_n).reshape(-1, 1)
     # w_init = np.ones(w_n).reshape(-1, 1)
 
-    w, log = optimize_gd(oracle, w_init, "wolfe", tol=1e-8, verbose=True)
+    w, log = optimize_newton(oracle, w_init, "armijo", tol=1e-8, verbose=True)
     # print(log.get_log()["oracle_calls"][-1])
     
     
