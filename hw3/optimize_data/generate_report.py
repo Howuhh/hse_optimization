@@ -8,46 +8,71 @@ np.random.seed(42)
 from oracle import make_oracle
 from tabulate import tabulate
 from optimize import optimize_gd, optimize_hfn, optimize_newton
+from optimize_bfgs import optimize_bfgs, optimize_lbfgs
+
+
+def file_name(path):
+    if path is None:
+        return "synthetic"
+    return path.split("/")[-1].split(".")[0] 
 
 
 def print_report(config, data_path=None):
-    print()
+    # print()
     oracle = make_oracle(data_path=data_path)
-    w_init = np.zeros((oracle.X.shape[1], 1))
+    w_init = np.zeros((oracle.dim, 1))
     
-    table = [["method", "line search", "entropy", "num iter", "oracle calls", "time, s"]]
+    table = [["method", "entropy", "num iter", "oracle calls", "time, s"]]
     
     for method in config:
-        optimizer = config[method]["optimizer"]
-        line_search_methods = config[method]["line_search_methods"]
+        optimizer, params = config[method]["optimizer"], config[method].get("params", {})
         
-        table = [["line search", "entropy", "num iter", "oracle calls", "time, s"]]
-        
-        for line_search in line_search_methods:
-            w, log = optimizer(oracle, w_init, line_search, tol=1e-8, max_iter=10000, verbose=False)
-            info = log.get_log()
+        w, log = optimizer(oracle, w_init, tol=1e-8, max_iter=10000, **params)
+        info = log.get_log()
     
-            table.append([line_search, info["entropy"][-1], info["num_iter"], info["oracle_calls"][-1], round(info["time"][-1], 2)])
+        table.append([method, round(info["entropy"][-1], 16), info["num_iter"], info["oracle_calls"][-1], round(info["time"][-1], 2)])
     
-        print(f"- {method.upper()} " + "-" * (68 - len(method)))
-        print(tabulate(table, tablefmt="github", headers="firstrow"))
-        print(f"-" * 71)
-        print()
+    table = tabulate(table, tablefmt="github", headers="firstrow")
+    
+    print(file_name(data_path).upper())
+    print("-" * table.find("\n"))
+    print(table)
+    print("-" * table.find("\n"))
+    print()
 
 
 def main():
     config = {
-        "gradient descent": {
+        "Gradient Descent (armijo)": {
             "optimizer": optimize_gd,
-            "line_search_methods": ["golden", "brent", "armijo", "wolfe", "lipschitz"]
+            "params": {
+                "line_search_method": "armijo"
+            }
         },
-        "newton": {
+        "Newton (wolfe)": {
             "optimizer": optimize_newton,
-            "line_search_methods": ["golden", "brent", "armijo", "wolfe"]
+            "params": {
+                "line_search_method": "wolfe"
+            }
         },
-        "hf_newton": {
+        "Hessian-Free Newton (armijo)": {
             "optimizer": optimize_hfn,
-            "line_search_methods": ["golden", "brent", "armijo", "wolfe"]
+            "params": {
+                "line_search_method": "armijo"
+            }
+        },
+        "BFGS (wolfe)": {
+            "optimizer": optimize_bfgs,
+            "params": {
+                "gamma": 20.0
+            }
+        },
+        "L-BFGS (wolfe)": {
+            "optimizer": optimize_lbfgs,
+            "params": {
+                "buffer_size": 100,
+                "gamma": 1.0
+            }
         }
     }
     

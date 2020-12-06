@@ -48,7 +48,7 @@ def optimize_hfn(oracle, start_point, line_search_method="armijo", tol=1e-8, max
 
 
 def main():    
-    w, log = run_optimizer("data/a1a.txt", optimize_newton, line_search_method="armijo", verbose=True)
+    w, log = run_optimizer("data/a1a.txt", optimize_newton, line_search_method="wolfe", verbose=True)
     
     
 if __name__ == "__main__":
