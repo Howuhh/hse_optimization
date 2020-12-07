@@ -24,15 +24,18 @@ def optimize_bfgs(oracle, w, tol=1e-8, gamma=30, max_iter=10000, verbose=False):
     H = gamma * I
     
     prev_w, prev_grad = w, oracle.grad(w).reshape(-1, 1)
+    grad0_norm = prev_grad.T @ prev_grad
     for iter_ in range(max_iter):
-        grad_norm = prev_grad.T @ prev_grad
+        grad_norm = (prev_grad.T @ prev_grad) / grad0_norm
         if grad_norm <= tol:
             break
         
         direction = H @ prev_grad
-        alpha = wolfe_line_search(oracle, w, direction)
+        alpha = wolfe_line_search(oracle, w, direction, not_converge="armijo")
         
-        if iter_ == 0:
+        # works only for near to zeros start points (from 100+ iterations to 80)
+        # but, may not converge sometimes (so, not a huge win)
+        if iter_ == 0: 
             alpha = 1.0
 
         w = w - alpha * direction
@@ -58,8 +61,7 @@ def optimize_bfgs(oracle, w, tol=1e-8, gamma=30, max_iter=10000, verbose=False):
 
 def lbfgs_direction(grad, gamma, s_q, y_q, r_q):
     alpha = np.zeros(len(s_q))
-    
-    # TODO: rewrite with reverse for deque, may be much faster!
+
     q = grad
     for i in range(len(s_q) - 1, -1, -1):
         alpha[i] = r_q[i] * s_q[i].T @ q
@@ -80,8 +82,10 @@ def optimize_lbfgs(oracle, w, tol=1e-8, buffer_size=5, gamma=1.0, max_iter=10000
     s_q, y_q, r_q = [deque(maxlen=buffer_size) for _ in range(3)]
     
     prev_w, prev_grad = w, oracle.grad(w).reshape(-1, 1)
+    grad0_norm = prev_grad.T @ prev_grad
+    
     for iter_ in range(max_iter):
-        grad_norm = prev_grad.T @ prev_grad
+        grad_norm = (prev_grad.T @ prev_grad) / grad0_norm
         if grad_norm <= tol:
             break
         
@@ -89,12 +93,9 @@ def optimize_lbfgs(oracle, w, tol=1e-8, buffer_size=5, gamma=1.0, max_iter=10000
             gamma = (y_q[-1].T @ s_q[-1]) / (y_q[-1].T @ y_q[-1])
             
         direction = lbfgs_direction(prev_grad, gamma, s_q, y_q, r_q)
-        alpha = wolfe_line_search(oracle, w, direction)
-        
-        if iter_ == 0:
-            alpha = 1.0
-        
-        w = w - alpha * direction         
+        alpha = wolfe_line_search(oracle, w, direction, not_converge="armijo")
+
+        w = w - alpha * direction
         new_grad = oracle.grad(w).reshape(-1, 1)
         
         s_q.append(w - prev_w)
@@ -113,8 +114,8 @@ def optimize_lbfgs(oracle, w, tol=1e-8, buffer_size=5, gamma=1.0, max_iter=10000
 
 
 def main():
-    # w, log = run_optimizer("data/a1a.txt", optimize_bfgs, verbose=True)
-    w, log = run_optimizer("data/a1a.txt", optimize_lbfgs, gamma=1.0, buffer_size=5, verbose=True)
+    # w, log = run_optimizer("data/a1a.txt", optimize_bfgs, gamma=30, verbose=True)
+    w, log = run_optimizer("data/a1a.txt", optimize_lbfgs, gamma=1.0, buffer_size=100, verbose=True)
     
 
 if __name__ == "__main__":

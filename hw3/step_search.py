@@ -23,12 +23,15 @@ def armijo_line_search(oracle, w, direction):
     return alpha
 
 
-def wolfe_line_search(oracle, w, direction):
+def wolfe_line_search(oracle, w, direction, not_converge="armijo"):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=LineSearchWarning)
         alpha = line_search(oracle.value, oracle.grad, w, -direction, direction.T)[0]
     
     if alpha is None:
-        alpha = armijo_line_search(oracle, w, direction)
+        if not_converge == "armijo":
+            alpha = armijo_line_search(oracle, w, direction)
+        else:
+            alpha = 1.0
 
     return alpha

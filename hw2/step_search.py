@@ -60,6 +60,7 @@ def armijo_line_search(oracle, w, direction, init_alpha="mean"):
 
 
 def wolfe_line_search(oracle, w, direction):
+    # TODO: not direction.T but gradient to wolfe
     alpha = line_search(oracle.value, oracle.grad, w, -direction, direction.T)[0]
     
     if alpha is None:

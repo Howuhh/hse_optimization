@@ -76,13 +76,13 @@ def all_methods():
         "BFGS": {
             "optimizer": optimize_bfgs,
             "params": {
-                "gamma": 20.0
+                "gamma": 40.0
             }
         },
         "L-BFGS": {
             "optimizer": optimize_lbfgs,
             "params": {
-                "buffer_size": 100,
+                "buffer_size": 50,
                 "gamma": 1.0
             }
         }

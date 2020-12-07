@@ -27,3 +27,12 @@ def entropy_hessian(X, w):
         return hessian.toarray()
     
     return hessian
+
+
+def entropy_hessian_product(X, w, d):
+    sigma = expit(X @ w)
+    sigma = sigma * (1 - sigma)
+    step1 = X @ d
+    step2 = sigma.reshape(-1, 1) * step1
+    step3 = X.T @ step2
+    return step3 / X.shape[0]

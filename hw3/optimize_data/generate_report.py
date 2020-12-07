@@ -66,7 +66,7 @@ def main():
         "BFGS (wolfe)": {
             "optimizer": optimize_bfgs,
             "params": {
-                "gamma": 20.0
+                "gamma": 30.0
             }
         },
         "L-BFGS (wolfe)": {
@@ -79,8 +79,8 @@ def main():
     }
     
     print_report(config, "../data/a1a.txt")
-    print_report(config, "../data/breast-cancer_scale.txt")
-    print_report(config)
+    # print_report(config, "../data/breast-cancer_scale.txt")
+    # print_report(config)
 
   
 def buffer_size():
@@ -122,9 +122,9 @@ def buffer_size():
         }
     }
     
-    print_report(config, "../data/a1a.txt")
+    print_report(config, None)
     
     
 if __name__ == "__main__":
-    # main()
-    buffer_size()
+    main()
+    # buffer_size()

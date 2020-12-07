@@ -6,7 +6,7 @@ import utils
 from sklearn.datasets import load_svmlight_file
 from sklearn.preprocessing import LabelBinarizer
 
-from cross_entropy import binary_cross_entropy, entropy_grad, entropy_hessian
+from cross_entropy import binary_cross_entropy, entropy_grad, entropy_hessian, entropy_hessian_product
 
 
 class Oracle:
@@ -37,11 +37,8 @@ class Oracle:
         return entropy_hessian(self.X, w)
 
     def hessian_vec_product(self, w, d):
-        self._call_count -= 1   
-        f_f = self.grad(w + self._h * d).reshape(-1, 1)
-        f_b = self.grad(w - self._h * d).reshape(-1, 1)
-        
-        return (f_f - f_b) / (2*self._h)
+        self._call_count += 1  
+        return entropy_hessian_product(self.X, w, d)
 
     def fuse_value_grad(self, w):
         self._call_count -= 1
@@ -54,7 +51,7 @@ class Oracle:
 
 def make_oracle(data_path=None, sparse=False):
     if data_path is None:
-        X, y, _ = utils.generate_dataset(n=1000, w_dim=10)
+        X, y, _ = utils.generate_dataset(n=1000, w_dim=100)
     else:
         X, y = load_svmlight_file(data_path)
         
