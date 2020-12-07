@@ -10,10 +10,13 @@ from collections import defaultdict
 from oracle import make_oracle
 
 from optimize import optimize_gd, optimize_hfn, optimize_newton
+from optimize_bfgs import optimize_bfgs, optimize_lbfgs
 from sklearn.linear_model import LogisticRegression
 
 
 def file_name(path):
+    if path is None:
+        return "synthetic"
     return path.split("/")[-1].split(".")[0] 
 
 
@@ -33,22 +36,15 @@ def run_model(config, data_paths, log_path="."):
         entropy_true = optimize_sklearn(oracle)
         w_init = np.zeros((oracle.X.shape[1], 1))
                         
-        if data_path is None:
-            data_name = "generated"
-        else:
-            data_name = file_name(data_path)
+        data_name = file_name(data_path)
 
         for method in tqdm(config, desc=f"Data -- {data_path}"):
-            optimizer = config[method]["optimizer"]
-            line_search_methods = config[method]["line_search_methods"]
+            optimizer, params = config[method]["optimizer"], config[method]["params"]            
+            w, log = optimizer(oracle, w_init, **params)
             
-            log_data[data_name][method] = {}
-        
-            for line_search in tqdm(line_search_methods, desc=f"Method -- {method}"):
-                w, log = optimizer(oracle, w_init, line_search, tol=1e-8, max_iter=10000, verbose=False)
-                
-                log.error = np.abs(log.get_log()["entropy"] - entropy_true)
-                log_data[data_name][method][line_search] = log
+            log.error = np.abs(log.get_log()["entropy"] - entropy_true)
+            
+            log_data[data_name][method] = log
 
     with open(log_path, "wb") as log_file:
         pickle.dump(log_data, log_file)          
@@ -56,27 +52,88 @@ def run_model(config, data_paths, log_path="."):
     return log_data
     
     
-def main():
+def all_methods():
     data_paths = [None, "../data/a1a.txt", "../data/breast-cancer_scale.txt"]
     config = {
-        "gradient descent": {
+        "Gradient Descent": {
             "optimizer": optimize_gd,
-            "line_search_methods": ["golden", "brent", "armijo", "wolfe", "lipschitz"]
+            "params": {
+                "line_search_method": "armijo"
+            }
         },
-        "newton": {
+        "Newton": {
             "optimizer": optimize_newton,
-            "line_search_methods": ["golden", "brent", "armijo", "wolfe"]
+            "params": {
+                "line_search_method": "wolfe"
+            }
         },
-        "hf_newton": {
+        "Hessian-Free Newton": {
             "optimizer": optimize_hfn,
-            "line_search_methods": ["golden", "brent", "armijo", "wolfe"]
+            "params": {
+                "line_search_method": "armijo"
+            }
+        },
+        "BFGS": {
+            "optimizer": optimize_bfgs,
+            "params": {
+                "gamma": 20.0
+            }
+        },
+        "L-BFGS": {
+            "optimizer": optimize_lbfgs,
+            "params": {
+                "buffer_size": 100,
+                "gamma": 1.0
+            }
         }
     }
     
-    log_data = run_model(config, data_paths, "line_search_data.pkl")
+    log_data = run_model(config, data_paths, "all_methods.pkl")
     
     
+def buffer_size():
+    data_paths = [None, "../data/a1a.txt", "../data/breast-cancer_scale.txt"]
+    config = {
+        "L-BFGS (buffer=5)": {
+            "optimizer": optimize_lbfgs,
+            "params": {
+                "buffer_size": 5,
+                "gamma": 1.0
+            }
+        },
+        "L-BFGS (bufffer=10)": {
+            "optimizer": optimize_lbfgs,
+            "params": {
+                "buffer_size": 10,
+                "gamma": 1.0
+            }
+        },
+        "L-BFGS (buffer=20)": {
+            "optimizer": optimize_lbfgs,
+            "params": {
+                "buffer_size": 20,
+                "gamma": 1.0
+            }
+        },
+        "L-BFGS (buffer=50)": {
+            "optimizer": optimize_lbfgs,
+            "params": {
+                "buffer_size": 50,
+                "gamma": 1.0
+            }
+        },
+        "L-BFGS (buffer=100)": {
+            "optimizer": optimize_lbfgs,
+            "params": {
+                "buffer_size": 100,
+                "gamma": 1.0
+            }
+        }
+    }
+    
+    log_data = run_model(config, data_paths, "buffer_size.pkl")
+
+
 if __name__ == "__main__":
-    main()
-    
-    
+    all_methods()
+    buffer_size()

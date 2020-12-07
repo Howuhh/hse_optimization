@@ -80,14 +80,17 @@ def run_optimizer(data_path, optimizer, **kwargs):
     return w, log
 
 
-def plot_metric(log, method, xaxis, offset=0):
+def plot_metric(log, data, xaxis, offset=0):
     fig, ax = plt.subplots(1, 2, figsize=(18, 8))
     
-    for line_search in log[method]:
-        line_search_log = log[method][line_search]
-        info = line_search_log.get_log()
+    for method in log[data]:
+        if method == "Gradient Descent":
+            continue
         
-        error = np.log10(line_search_log.error)[offset:]
+        method_log = log[data][method]
+        info = method_log.get_log()
+        
+        error = np.log10(method_log.error)[offset:]
         grads = np.log10(info["grad_info"])[offset:]
         
         if xaxis == "num_iter":
@@ -95,15 +98,15 @@ def plot_metric(log, method, xaxis, offset=0):
         else:
             metric = info[xaxis][offset:]
         
-        ax[0].plot(metric, error)
-        ax[1].plot(metric, grads, label=f"{line_search}: {round(info['entropy'][-1],6)}")
+        ax[0].plot(metric, error, label=f"{method}: {round(info['entropy'][-1],6)}")
+        ax[1].plot(metric, grads.ravel())
         
     ax[0].set(title="Convergence by $|F(w^*) - F(w)|$", 
               xlabel=xaxis, ylabel="$\\log_{10} |F(w^*) - F(w)|$")
     ax[1].set(title="Convergence by $\\frac{|\\nabla F(w)|}{|\\nabla F(w_0)|}$",
               xlabel=xaxis, ylabel="$\\log_{10} \\frac{|\\nabla F(w)|}{|\\nabla F(w_0)|}$")
     
-    ax[1].legend()
+    ax[0].legend()
 
 
 if __name__ == "__main__":

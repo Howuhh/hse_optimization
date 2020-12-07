@@ -54,7 +54,7 @@ class Oracle:
 
 def make_oracle(data_path=None, sparse=False):
     if data_path is None:
-        X, y, _ = utils.generate_dataset(n=1000, w_dim=3)
+        X, y, _ = utils.generate_dataset(n=1000, w_dim=10)
     else:
         X, y = load_svmlight_file(data_path)
         

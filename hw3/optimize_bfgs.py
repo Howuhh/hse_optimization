@@ -18,6 +18,7 @@ def bfgs_update(H, I, s, y):
 
 def optimize_bfgs(oracle, w, tol=1e-8, gamma=30, max_iter=10000, verbose=False):
     log = OptimizeLog(start_time=time())
+    oracle.reset_oracle_count()
     
     I = np.identity(oracle.dim)
     H = gamma * I
@@ -55,15 +56,16 @@ def optimize_bfgs(oracle, w, tol=1e-8, gamma=30, max_iter=10000, verbose=False):
     return w, log
 
 
-def lbfgs_direction(grad, H0, s_q, y_q, r_q):
+def lbfgs_direction(grad, gamma, s_q, y_q, r_q):
     alpha = np.zeros(len(s_q))
     
+    # TODO: rewrite with reverse for deque, may be much faster!
     q = grad
     for i in range(len(s_q) - 1, -1, -1):
         alpha[i] = r_q[i] * s_q[i].T @ q
         q = q - alpha[i] * y_q[i]
         
-    Hd = H0 @ q
+    Hd = gamma * q
     for i in range(len(s_q)):
         beta = r_q[i] * y_q[i].T @ Hd
         Hd = Hd + s_q[i] * (alpha[i] - beta)    
@@ -73,9 +75,9 @@ def lbfgs_direction(grad, H0, s_q, y_q, r_q):
 
 def optimize_lbfgs(oracle, w, tol=1e-8, buffer_size=5, gamma=1.0, max_iter=10000, verbose=False):
     log = OptimizeLog(start_time=time())
+    oracle.reset_oracle_count()
     
     s_q, y_q, r_q = [deque(maxlen=buffer_size) for _ in range(3)]
-    I = np.identity(oracle.dim)
     
     prev_w, prev_grad = w, oracle.grad(w).reshape(-1, 1)
     for iter_ in range(max_iter):
@@ -83,12 +85,10 @@ def optimize_lbfgs(oracle, w, tol=1e-8, buffer_size=5, gamma=1.0, max_iter=10000
         if grad_norm <= tol:
             break
         
-        if iter_ == 0:
-            H0 = gamma * I
-        else:
-            H0 = (y_q[-1].T @ s_q[-1]) / (y_q[-1].T @ y_q[-1]) * I
+        if iter_ != 0:
+            gamma = (y_q[-1].T @ s_q[-1]) / (y_q[-1].T @ y_q[-1])
             
-        direction = lbfgs_direction(prev_grad, H0, s_q, y_q, r_q)
+        direction = lbfgs_direction(prev_grad, gamma, s_q, y_q, r_q)
         alpha = wolfe_line_search(oracle, w, direction)
         
         if iter_ == 0:
@@ -113,8 +113,8 @@ def optimize_lbfgs(oracle, w, tol=1e-8, buffer_size=5, gamma=1.0, max_iter=10000
 
 
 def main():
-    w, log = run_optimizer("data/a1a.txt", optimize_bfgs, verbose=True)
-    w, log = run_optimizer("data/a1a.txt", optimize_lbfgs, buffer_size=100, verbose=True)
+    # w, log = run_optimizer("data/a1a.txt", optimize_bfgs, verbose=True)
+    w, log = run_optimizer("data/a1a.txt", optimize_lbfgs, gamma=1.0, buffer_size=5, verbose=True)
     
 
 if __name__ == "__main__":

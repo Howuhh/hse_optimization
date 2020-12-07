@@ -7,6 +7,7 @@ np.random.seed(42)
 
 from oracle import make_oracle
 from tabulate import tabulate
+from memory_profiler import memory_usage
 from optimize import optimize_gd, optimize_hfn, optimize_newton
 from optimize_bfgs import optimize_bfgs, optimize_lbfgs
 
@@ -22,7 +23,7 @@ def print_report(config, data_path=None):
     oracle = make_oracle(data_path=data_path)
     w_init = np.zeros((oracle.dim, 1))
     
-    table = [["method", "entropy", "num iter", "oracle calls", "time, s"]]
+    table = [["method", "entropy", "num iter", "oracle calls", "mean mem usage, MiB", "time, s"]]
     
     for method in config:
         optimizer, params = config[method]["optimizer"], config[method].get("params", {})
@@ -30,7 +31,8 @@ def print_report(config, data_path=None):
         w, log = optimizer(oracle, w_init, tol=1e-8, max_iter=10000, **params)
         info = log.get_log()
     
-        table.append([method, round(info["entropy"][-1], 16), info["num_iter"], info["oracle_calls"][-1], round(info["time"][-1], 2)])
+        max_memory = np.mean(memory_usage((optimizer, (oracle, w_init), params), interval=0.0001))
+        table.append([method, round(info["entropy"][-1], 16), info["num_iter"], info["oracle_calls"][-1], max_memory, round(info["time"][-1], 2)])
     
     table = tabulate(table, tablefmt="github", headers="firstrow")
     
@@ -79,7 +81,50 @@ def main():
     print_report(config, "../data/a1a.txt")
     print_report(config, "../data/breast-cancer_scale.txt")
     print_report(config)
+
+  
+def buffer_size():
+    config = {
+        "L-BFGS (buffer=5)": {
+            "optimizer": optimize_lbfgs,
+            "params": {
+                "buffer_size": 5,
+                "gamma": 1.0
+            }
+        },
+        "L-BFGS (bufffer=10)": {
+            "optimizer": optimize_lbfgs,
+            "params": {
+                "buffer_size": 10,
+                "gamma": 1.0
+            }
+        },
+        "L-BFGS (buffer=20)": {
+            "optimizer": optimize_lbfgs,
+            "params": {
+                "buffer_size": 20,
+                "gamma": 1.0
+            }
+        },
+        "L-BFGS (buffer=50)": {
+            "optimizer": optimize_lbfgs,
+            "params": {
+                "buffer_size": 50,
+                "gamma": 1.0
+            }
+        },
+        "L-BFGS (buffer=100)": {
+            "optimizer": optimize_lbfgs,
+            "params": {
+                "buffer_size": 100,
+                "gamma": 1.0
+            }
+        }
+    }
+    
+    print_report(config, "../data/a1a.txt")
     
     
 if __name__ == "__main__":
-    main()
+    # main()
+    buffer_size()
