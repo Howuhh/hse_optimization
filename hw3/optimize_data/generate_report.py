@@ -43,7 +43,7 @@ def print_report(config, data_path=None):
     print()
 
 
-def main():
+def all_methods():
     config = {
         "Gradient Descent (armijo)": {
             "optimizer": optimize_gd,
@@ -66,7 +66,7 @@ def main():
         "BFGS (wolfe)": {
             "optimizer": optimize_bfgs,
             "params": {
-                "gamma": 30.0
+                "gamma": 20.0
             }
         },
         "L-BFGS (wolfe)": {
@@ -79,8 +79,8 @@ def main():
     }
     
     print_report(config, "../data/a1a.txt")
-    # print_report(config, "../data/breast-cancer_scale.txt")
-    # print_report(config)
+    print_report(config, "../data/breast-cancer_scale.txt")
+    print_report(config)
 
   
 def buffer_size():
@@ -113,6 +113,13 @@ def buffer_size():
                 "gamma": 1.0
             }
         },
+        "L-BFGS (buffer=80)": {
+            "optimizer": optimize_lbfgs,
+            "params": {
+                "buffer_size": 80,
+                "gamma": 1.0
+            }
+        },
         "L-BFGS (buffer=100)": {
             "optimizer": optimize_lbfgs,
             "params": {
@@ -122,9 +129,9 @@ def buffer_size():
         }
     }
     
-    print_report(config, None)
+    print_report(config, "../data/a1a.txt")
     
     
 if __name__ == "__main__":
-    main()
-    # buffer_size()
+    # all_methods()
+    buffer_size()

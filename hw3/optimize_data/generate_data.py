@@ -76,13 +76,13 @@ def all_methods():
         "BFGS": {
             "optimizer": optimize_bfgs,
             "params": {
-                "gamma": 40.0
+                "gamma": 20.0
             }
         },
         "L-BFGS": {
             "optimizer": optimize_lbfgs,
             "params": {
-                "buffer_size": 50,
+                "buffer_size": 80,
                 "gamma": 1.0
             }
         }
@@ -122,6 +122,13 @@ def buffer_size():
                 "gamma": 1.0
             }
         },
+        "L-BFGS (buffer=80)": {
+            "optimizer": optimize_lbfgs,
+            "params": {
+                "buffer_size": 80,
+                "gamma": 1.0
+            }
+        },
         "L-BFGS (buffer=100)": {
             "optimizer": optimize_lbfgs,
             "params": {
@@ -135,5 +142,5 @@ def buffer_size():
 
 
 if __name__ == "__main__":
-    all_methods()
+    # all_methods()
     buffer_size()

@@ -35,8 +35,8 @@ def optimize_bfgs(oracle, w, tol=1e-8, gamma=30, max_iter=10000, verbose=False):
         
         # works only for near to zeros start points (from 100+ iterations to 80)
         # but, may not converge sometimes (so, not a huge win)
-        if iter_ == 0: 
-            alpha = 1.0
+        # if iter_ == 0: 
+            # alpha = 1.0
 
         w = w - alpha * direction
         
@@ -90,7 +90,7 @@ def optimize_lbfgs(oracle, w, tol=1e-8, buffer_size=5, gamma=1.0, max_iter=10000
             break
         
         if iter_ != 0:
-            gamma = (y_q[-1].T @ s_q[-1]) / (y_q[-1].T @ y_q[-1])
+            gamma = (y_q[-1].T @ s_q[-1]) / ((y_q[-1].T @ y_q[-1]) + 1e-14)
             
         direction = lbfgs_direction(prev_grad, gamma, s_q, y_q, r_q)
         alpha = wolfe_line_search(oracle, w, direction, not_converge="armijo")
@@ -100,7 +100,7 @@ def optimize_lbfgs(oracle, w, tol=1e-8, buffer_size=5, gamma=1.0, max_iter=10000
         
         s_q.append(w - prev_w)
         y_q.append(new_grad - prev_grad)
-        r_q.append(1 / (y_q[-1].T @ s_q[-1])) # div by zero ???
+        r_q.append(1 / ((y_q[-1].T @ s_q[-1]) + 1e-14)) # div by zero ???
         
         prev_w, prev_grad = w, new_grad
         
@@ -114,8 +114,8 @@ def optimize_lbfgs(oracle, w, tol=1e-8, buffer_size=5, gamma=1.0, max_iter=10000
 
 
 def main():
-    # w, log = run_optimizer("data/a1a.txt", optimize_bfgs, gamma=30, verbose=True)
-    w, log = run_optimizer("data/a1a.txt", optimize_lbfgs, gamma=1.0, buffer_size=100, verbose=True)
+    # w, log = run_optimizer(None, optimize_bfgs, gamma=10, verbose=True)
+    w, log = run_optimizer(None, optimize_lbfgs, gamma=1.0, buffer_size=100, verbose=True)
     
 
 if __name__ == "__main__":
