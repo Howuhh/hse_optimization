@@ -16,7 +16,7 @@ def bfgs_update(H, I, s, y):
     return H_new
 
 
-def optimize_bfgs(oracle, w, tol=1e-8, gamma=30, max_iter=10000, verbose=False):
+def optimize_bfgs(oracle, w, tol=1e-8, gamma=1.0, max_iter=10000, verbose=False):
     log = OptimizeLog(start_time=time())
     oracle.reset_oracle_count()
     

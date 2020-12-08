@@ -27,6 +27,7 @@ kiwisolver==1.2.0
 MarkupSafe==1.1.1
 matplotlib==3.3.2
 mccabe==0.6.1
+memory-profiler==0.58.0
 mistune==0.8.4
 nbclient==0.5.0
 nbconvert==6.0.7
@@ -44,6 +45,7 @@ Pillow==7.2.0
 pip-chill==1.0.0
 prometheus-client==0.8.0
 prompt-toolkit==3.0.7
+psutil==5.7.3
 ptyprocess==0.6.0
 pycodestyle==2.6.0
 pycparser==2.20
