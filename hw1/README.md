@@ -1,6 +1,4 @@
-# HW1 - Single variable optimization
-
-Implemented: Ternary search, Golden section, Parabola Iterpolation, Brent
+# HW1 - Ternary search, Golden section, Parabola Iterpolation, Brent
 
 analysis of the results in eda.ipynb
 
