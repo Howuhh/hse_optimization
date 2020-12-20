@@ -1,9 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def pos_def_matrix(N):
     A_ = np.random.randn(N, N)
     return A_ @ A_.T
+
 
 def num_grad(f, x, eps=1e-8):
     grad = np.zeros(shape=(x.shape[0], 1))
@@ -15,6 +17,7 @@ def num_grad(f, x, eps=1e-8):
         e[i] = 0
     
     return grad
+
 
 def num_hessian(df, x, eps=1e-8):
     hessian = np.zeros(shape=(x.shape[0], x.shape[0]))
@@ -32,8 +35,8 @@ def plot_error(oracle, precision=np.float64):
     h = np.logspace(-18, 0, 100).astype(precision)
     errors = np.zeros_like(h).astype(precision)
 
-    # np.random.seed(12)
-    x = np.random.uniform(0.1, 1, size=(oracle.N, 1)).astype(precision)
+    x = np.random.uniform(size=(oracle.N, 1)).astype(precision)
+    
     for i in range(errors.shape[0]):
         errors[i] = np.linalg.norm(num_grad(oracle.value, x, eps=h[i]) - oracle.grad(x), 1)
 
@@ -45,10 +48,9 @@ def plot_error(oracle, precision=np.float64):
     plt.axvline(np.sqrt(eps), color="gray" if precision == np.float64 else "black", linestyle="--")
     plt.xlabel("$h$")
     plt.ylabel("abs error")
-    # plt.show()
 
 
-def check_task(oracle, x_type="vec", seed=42):
+def check_task(oracle, seed=42):
     np.random.seed(seed)
     
     x = np.random.uniform(size=(oracle.N, 1))

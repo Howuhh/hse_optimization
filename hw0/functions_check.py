@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from grad_check import pos_def_matrix
 from grad_check import check_task, plot_error
 
+
 class Task4_1:
     def __init__(self, N=5):
         self.A = pos_def_matrix(N)
@@ -18,6 +19,7 @@ class Task4_1:
     def hessian(self, x):    
         I = np.identity(self.N)
         return 2 * (x.T @ x) * I + 4 * (x @ x.T) - 2 * self.A
+
 
 class Task4_2:
     def __init__(self, N=5):
@@ -36,6 +38,7 @@ class Task4_2:
         A, I = self.A, np.identity(self.N)
                 
         return 2 / x_norm**4 * (x_norm**2 * A - 2*A @ x @ x.T - x.T @ A @ x * I - 2*x @ x.T @ A + (4/x_norm**2) * x @ x.T @ A @ x @ x.T)
+
     
 class Task4_3:
     def __init__(self, N=5):
