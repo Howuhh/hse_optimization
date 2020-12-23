@@ -25,14 +25,6 @@ def generate_dataset(n=50, w_dim=1, sparse=False):
     return X, y, w
 
 
-def run_optimizer(data_path, optimizer, **kwargs):
-    oracle_ = oracle.make_oracle(data_path)
-    w_init = np.zeros(oracle_.dim).reshape(-1, 1)
-    
-    w, log = optimizer(oracle_, w_init, **kwargs)
-    return w, log
-
-
 def plot_convergence(log):
     fig, ax = plt.subplots(1, 2, figsize=(18, 8))
     

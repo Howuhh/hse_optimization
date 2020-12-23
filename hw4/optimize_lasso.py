@@ -2,9 +2,8 @@ import numpy as np
 
 from time import time
 from optimize_log import OptimizeLog
-from utils import run_optimizer
 
-# https://towardsdatascience.com/unboxing-lasso-regularization-with-proximal-gradient-method-ista-iterative-soft-thresholding-b0797f05f8ea
+from oracle import make_oracle
 
 
 def prox_l1(w, gamma):
@@ -29,8 +28,8 @@ def optimize_lasso(oracle, start_point, tol=1e-8, lambda_=1e-2, max_iter=10000, 
             if oracle.value(w_new) <= value_w + grad_w @ w_diff + (L / 2) * w_diff_norm:
                 break                
             L = 2 * L    
-        
-        if w_diff_norm * L < tol:
+                
+        if w_diff_norm * L**2 <= tol:
             break
         
         w = w_new
@@ -44,10 +43,11 @@ def optimize_lasso(oracle, start_point, tol=1e-8, lambda_=1e-2, max_iter=10000, 
     return w, log
 
 
-def main():    
-    w, log = run_optimizer("data/a1a.txt", optimize_lasso, lambda_=0.00001)
+def main():
+    oracle = make_oracle("data/a1a.txt")
+    w_init = np.zeros((oracle.dim, 1))
     
-    print(log.get_log_last())
+    w, log = optimize_lasso(oracle, w_init, lambda_=1e-4, verbose=True)
     
 
 if __name__ == "__main__":

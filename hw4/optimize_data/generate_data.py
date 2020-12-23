@@ -43,3 +43,4 @@ def generate_data(data_path, lrs):
 
 if __name__ == "__main__":
     generate_data("../data/a1a.txt", np.logspace(-1, -8, 64))
+    generate_data("../data/breast-cancer_scale.txt", np.logspace(-1, -8, 64))
