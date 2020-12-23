@@ -5,6 +5,12 @@ import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix
 
 
+def file_name(path):
+    if path is None:
+        return "synthetic"
+    return path.split("/")[-1].split(".")[0] 
+
+
 def generate_dataset(n=50, w_dim=1, sparse=False):
     X = np.random.normal(size=(n, w_dim))
     X = np.hstack((X, np.ones(X.shape[0]).reshape(-1, 1)))
@@ -27,55 +33,44 @@ def run_optimizer(data_path, optimizer, **kwargs):
     return w, log
 
 
-def plot_weights(oracle, optimize, penalty_range, names=None, intercept=True):
-    weight_path = np.zeros((oracle.dim, len(penalty_range)))
+def plot_convergence(log):
+    fig, ax = plt.subplots(1, 2, figsize=(18, 8))
+    
+    iters = np.arange(len(log["best_run_entropy"]))
+    
+    ax[0].plot(iters, np.log10(log["best_run_entropy"]), label=f"best entropy: {round(log['best_run_entropy'][-1],6)}")
+    ax[1].plot(iters, np.log10(log["best_run_grad"]))
 
-    w_init = np.zeros((oracle.dim, 1))
-    for i, penalty in enumerate(penalty_range):
-        w = optimize(oracle, w_init, lambda_=penalty)
-        
-        weight_path[:, i] = w.ravel()
+    ax[0].set(title="Convergence by $F(w)$", xlabel="iteration", ylabel="$F(w)$")
+    ax[1].set(title="Convergence by stopping criterion", xlabel="iteration", ylabel="stopping criterion")
 
+    ax[0].legend()
+
+
+def plot_lr(log):
+    fig, ax = plt.subplots(3, 1, figsize=(12, 14))
+    
+    ylabels = ["Time, s", "Number of iterations", "Number of nonzero weights"]
+    
+    for i, metric in enumerate(["time", "iters", "nonzero"]):
+        ax[i].plot(log["lr"], log[metric])
+        ax[i].set(xlabel="$\lambda$", ylabel=ylabels[i])
+        ax[i].set_xscale("log")
+
+
+def plot_weights(log, intercept=False):
+    weight_path = log["weights_path"]
+    
     if not intercept:
         weight_path = weight_path[:-1]
         
     plt.figure(figsize=(12, 8))
     for i, w in enumerate(weight_path):
-        plt.plot(penalty_range, w)
+        plt.plot(log["lr"], w)
     
+    plt.xscale("log")
     plt.xlabel("$\lambda$")
     plt.ylabel("$W_{i}$")
-    plt.grid()
-
-
-# TODO: rewrite
-def plot_metric(log, data, xaxis, offset=0):
-    fig, ax = plt.subplots(1, 2, figsize=(18, 8))
-    
-    for method in log[data]:
-        if method == "Gradient Descent":
-            continue
-        
-        method_log = log[data][method]
-        info = method_log.get_log()
-        
-        error = np.log10(method_log.error)[offset:]
-        grads = np.log10(info["grad_info"])[offset:]
-        
-        if xaxis == "num_iter":
-            metric = np.arange(error.shape[0])
-        else:
-            metric = info[xaxis][offset:]
-        
-        ax[0].plot(metric, error, label=f"{method}: {round(info['entropy'][-1],6)}")
-        ax[1].plot(metric, grads.ravel())
-        
-    ax[0].set(title="Convergence by $|F(w^*) - F(w)|$", 
-              xlabel=xaxis, ylabel="$\\log_{10} |F(w^*) - F(w)|$")
-    ax[1].set(title="Convergence by $\\frac{|\\nabla F(w)|}{|\\nabla F(w_0)|}$",
-              xlabel=xaxis, ylabel="$\\log_{10} \\frac{|\\nabla F(w)|}{|\\nabla F(w_0)|}$")
-    
-    ax[0].legend()
 
 
 if __name__ == "__main__":

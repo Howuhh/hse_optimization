@@ -7,19 +7,14 @@ np.random.seed(42)
 from oracle import make_oracle
 from tabulate import tabulate
 from optimize_lasso import optimize_lasso
-
-
-def file_name(path):
-    if path is None:
-        return "synthetic"
-    return path.split("/")[-1].split(".")[0] 
+from utils import file_name
 
 
 def print_report(config, data_path=None):
     oracle = make_oracle(data_path=data_path)
     w_init = np.zeros((oracle.dim, 1))
     
-    table = [["method", "entropy", "num iter", "oracle calls", "time, s"]]
+    table = [["method", "entropy", "num iter", "nonzero params", "oracle calls", "time, s"]]
     
     optimizer = config["optimizer"]
     
@@ -27,7 +22,9 @@ def print_report(config, data_path=None):
         w, log = optimizer(oracle, w_init, tol=1e-8, max_iter=10000, lambda_=lambda_)
         
         method_name = f"{config['method']} (lambda={lambda_})"
-        table.append([method_name, *log.get_log_last()[:-1]])
+        
+        stats = log.get_log_last()[:-1]
+        table.append([method_name, stats[0], stats[1], np.sum(w != 0), *stats[2:]])
     
     table = tabulate(table, tablefmt="github", headers="firstrow")
     
